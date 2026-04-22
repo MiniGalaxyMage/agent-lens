@@ -76,7 +76,6 @@ Carlos quiere que el frontend esté listo hoy. Vibe: inspector de red del navega
       },
     ],
     skills_used: ['coding-agent', 'frontend-design'],
-    skills_available: ['coding-agent', 'frontend-design', 'github', 'gog', 'obsidian', 'weather'],
     stdout: `✓ Created src/types.ts
 ✓ Created src/mockData.ts
 ✓ Created src/store.ts
@@ -136,7 +135,6 @@ public class ExamService {
       },
     ],
     skills_used: ['coding-agent', 'github'],
-    skills_available: ['coding-agent', 'github', 'gog', 'obsidian'],
     stdout: `Analyzing ExamSession entity...
 Found issue: LocalDateTime used without timezone info
 Attempting fix: migrate to ZonedDateTime...
@@ -173,7 +171,6 @@ Rollback executed successfully`,
       },
     ],
     skills_used: ['gog'],
-    skills_available: ['coding-agent', 'frontend-design', 'github', 'gog', 'obsidian', 'weather'],
     stdout: `📧 Gmail: 3 unread emails
   → [URGENT] AWS bill: $127.42 this month (vs $89 last month) — from aws-billing@amazon.com
   → LinkedIn: 2 new connection requests
@@ -216,7 +213,6 @@ class JISTheme {
       },
     ],
     skills_used: ['coding-agent'],
-    skills_available: ['coding-agent', 'github'],
     stdout: `Analyzing JIS Flutter project structure...
 Reading existing screens for patterns...
 Creating question_review_screen.dart...
@@ -245,7 +241,6 @@ Sé útil de verdad, no performativamente.`,
       },
     ],
     skills_used: ['weather', 'gog'],
-    skills_available: ['coding-agent', 'frontend-design', 'github', 'gog', 'obsidian', 'weather'],
     stdout: `☀️ Weather: Madrid, 24°C, partly cloudy. No rain expected.
 
 📅 Calendar today (2026-04-22):

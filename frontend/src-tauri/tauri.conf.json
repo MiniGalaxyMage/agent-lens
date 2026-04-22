@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "frontend",
+  "productName": "Agent Lens",
   "version": "0.1.0",
-  "identifier": "com.galaxymage.frontend",
+  "identifier": "com.galaxymage.agentlens",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,9 +12,13 @@
   "app": {
     "windows": [
       {
-        "title": "frontend",
-        "width": 800,
-        "height": 600
+        "title": "Agent Lens",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1000,
+        "minHeight": 700,
+        "resizable": true,
+        "center": true
       }
     ],
     "security": {

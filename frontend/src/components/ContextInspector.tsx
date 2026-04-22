@@ -130,7 +130,7 @@ export function ContextInspector() {
                 {execution.skills_used.length} active
               </span>
             </div>
-            {execution.skills_available.map((skill) => (
+            {execution.skills_used.map((skill) => (
               <SkillBadge
                 key={skill}
                 name={skill}
