@@ -4,6 +4,8 @@ import type { Execution, Project, FilterState, ExecutionSummary } from './types'
 import { MOCK_EXECUTIONS, MOCK_PROJECTS } from './mockData';
 import * as tauri from './tauri';
 
+type Theme = 'dark' | 'light' | 'system';
+
 interface AppState {
   executions: Execution[];
   projects: Project[];
@@ -14,6 +16,7 @@ interface AppState {
   sidebarCollapsed: boolean;
   isLoading: boolean;
   isTauriMode: boolean;
+  theme: Theme;
   loadData: () => Promise<void>;
   selectExecution: (id: string) => void;
   selectProject: (id: string) => void;
@@ -23,6 +26,14 @@ interface AppState {
   saveExecution: (exec: Execution) => Promise<void>;
   deleteExecution: (id: string) => Promise<void>;
   clearAll: () => Promise<void>;
+  setTheme: (theme: Theme) => void;
+}
+
+function resolveTheme(theme: Theme): 'dark' | 'light' {
+  if (theme === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return theme;
 }
 
 export const useAppStore = create<AppState>()(
@@ -37,6 +48,7 @@ export const useAppStore = create<AppState>()(
       sidebarCollapsed: false,
       isLoading: false,
       isTauriMode: false,
+      theme: 'dark',
 
       loadData: async () => {
         set({ isLoading: true });
@@ -117,13 +129,36 @@ export const useAppStore = create<AppState>()(
           console.error('clear error', err);
         }
       },
+
+      setTheme: (theme: Theme) => {
+        const resolved = resolveTheme(theme);
+        document.documentElement.setAttribute('data-theme', resolved);
+        set({ theme });
+      },
     }),
     {
       name: 'agent-lens-state',
-      partialize: (s) => ({ selectedProjectId: s.selectedProjectId, filters: s.filters, sidebarCollapsed: s.sidebarCollapsed }),
+      partialize: (s) => ({
+        selectedProjectId: s.selectedProjectId,
+        filters: s.filters,
+        sidebarCollapsed: s.sidebarCollapsed,
+        theme: s.theme,
+      }),
     }
   )
 );
+
+// Apply theme on load
+const stored = localStorage.getItem('agent-lens-state');
+if (stored) {
+  try {
+    const parsed = JSON.parse(stored);
+    if (parsed.state?.theme) {
+      const resolved = resolveTheme(parsed.state.theme);
+      document.documentElement.setAttribute('data-theme', resolved);
+    }
+  } catch {}
+}
 
 export const useSelectedExecution = () => {
   const { executions, selectedExecutionId } = useAppStore();

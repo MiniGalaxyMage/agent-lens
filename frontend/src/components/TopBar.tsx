@@ -1,18 +1,32 @@
-import { Settings, ChevronDown, Eye, Layers } from 'lucide-react';
+import { Settings, ChevronDown, Eye, Layers, Sun, Moon, Monitor } from 'lucide-react';
 import { useAppStore } from '../store';
 import { useState, useRef, useEffect } from 'react';
 
+type Theme = 'dark' | 'light' | 'system';
+
+const THEME_OPTIONS: { value: Theme; label: string; icon: React.ReactNode }[] = [
+  { value: 'dark', label: 'Dark', icon: <Moon size={12} /> },
+  { value: 'light', label: 'Light', icon: <Sun size={12} /> },
+  { value: 'system', label: 'System', icon: <Monitor size={12} /> },
+];
+
 export function TopBar() {
-  const { projects, selectedProjectId, selectProject } = useAppStore();
+  const { projects, selectedProjectId, selectProject, theme, setTheme } = useAppStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [themeOpen, setThemeOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef<HTMLDivElement>(null);
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
+  const currentTheme = THEME_OPTIONS.find((t) => t.value === theme) ?? THEME_OPTIONS[0];
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (themeRef.current && !themeRef.current.contains(e.target as Node)) {
+        setThemeOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -128,12 +142,11 @@ export function TopBar() {
                 />
                 <div>
                   <p className="font-medium">{project.name}</p>
-                  <p
-                    className="text-[10px] font-mono mt-0.5"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    {project.path}
-                  </p>
+                  {project.path && (
+                    <p className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      {project.path}
+                    </p>
+                  )}
                 </div>
               </button>
             ))}
@@ -141,22 +154,90 @@ export function TopBar() {
         )}
       </div>
 
-      {/* Right: settings */}
-      <button
-        className="p-2 rounded-md transition-smooth"
-        style={{ color: 'var(--text-muted)' }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = 'var(--text-primary)';
-          e.currentTarget.style.background = 'var(--surface-elevated)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = 'var(--text-muted)';
-          e.currentTarget.style.background = 'transparent';
-        }}
-        aria-label="Settings"
-      >
-        <Settings size={16} />
-      </button>
+      {/* Right: theme + settings */}
+      <div className="flex items-center gap-1">
+        {/* Theme selector */}
+        <div className="relative" ref={themeRef}>
+          <button
+            onClick={() => setThemeOpen((v) => !v)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs transition-smooth"
+            style={{
+              background: themeOpen ? 'var(--surface-elevated)' : 'transparent',
+              border: `1px solid ${themeOpen ? 'var(--accent)' : 'var(--border)'}`,
+              color: 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              if (!themeOpen) {
+                e.currentTarget.style.borderColor = 'rgba(124,92,255,0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!themeOpen) {
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }
+            }}
+          >
+            {currentTheme.icon}
+            <span>{currentTheme.label}</span>
+          </button>
+
+          {themeOpen && (
+            <div
+              className="absolute top-full mt-1.5 right-0 z-50 rounded-lg overflow-hidden min-w-[120px]"
+              style={{
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+              }}
+            >
+              {THEME_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    setTheme(opt.value);
+                    setThemeOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs transition-smooth flex items-center gap-2"
+                  style={{
+                    background:
+                      opt.value === theme ? 'rgba(124,92,255,0.12)' : 'transparent',
+                    color:
+                      opt.value === theme ? 'var(--accent)' : 'var(--text-primary)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (opt.value !== theme)
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (opt.value !== theme)
+                      e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  {opt.icon}
+                  <span>{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Settings button */}
+        <button
+          className="p-2 rounded-md transition-smooth"
+          style={{ color: 'var(--text-muted)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--text-primary)';
+            e.currentTarget.style.background = 'var(--surface-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.background = 'transparent';
+          }}
+          aria-label="Settings"
+        >
+          <Settings size={16} />
+        </button>
+      </div>
     </header>
   );
 }
