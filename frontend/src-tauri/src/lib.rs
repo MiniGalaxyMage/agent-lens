@@ -53,7 +53,11 @@ fn init_db(app: &AppHandle) -> Result<Connection, Box<dyn std::error::Error>> {
     let db_path = get_db_path(app);
     let conn = Connection::open(&db_path)?;
 
-    conn.execute("PRAGMA journal_mode=WAL", [])?;
+    // Set WAL journal mode
+    {
+        let mut stmt = conn.prepare("PRAGMA journal_mode=WAL")?;
+        let _: Option<String> = stmt.query_row([], |row| row.get(0))?;
+    }
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS executions (
