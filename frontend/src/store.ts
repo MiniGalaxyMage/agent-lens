@@ -11,7 +11,7 @@ interface AppState {
   projects: Project[];
   selectedExecutionId: string | null;
   selectedProjectId: string;
-  activeTab: 'files' | 'skills' | 'request' | 'response';
+  activeTab: 'files' | 'skills' | 'tools' | 'request' | 'response';
   filters: FilterState;
   sidebarCollapsed: boolean;
   isLoading: boolean;
@@ -20,7 +20,7 @@ interface AppState {
   loadData: () => Promise<void>;
   selectExecution: (id: string) => void;
   selectProject: (id: string) => void;
-  setActiveTab: (tab: 'files' | 'skills' | 'request' | 'response') => void;
+  setActiveTab: (tab: 'files' | 'skills' | 'tools' | 'request' | 'response') => void;
   setFilters: (filters: Partial<FilterState>) => void;
   toggleSidebar: () => void;
   saveExecution: (exec: Execution) => Promise<void>;
@@ -69,6 +69,7 @@ export const useAppStore = create<AppState>()(
                     ...e,
                     context_files: [],
                     skills_used: [],
+                    tools_used: [],
                     stdout: '',
                     stderr: '',
                     exit_code: 0,
@@ -98,7 +99,7 @@ export const useAppStore = create<AppState>()(
 
       selectExecution: (id) => set({ selectedExecutionId: id, activeTab: 'files' }),
       selectProject: (id) => set({ selectedProjectId: id, selectedExecutionId: null }),
-      setActiveTab: (tab) => set({ activeTab: tab }),
+      setActiveTab: (tab: 'files' | 'skills' | 'tools' | 'request' | 'response') => set({ activeTab: tab }),
       setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f } })),
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
 

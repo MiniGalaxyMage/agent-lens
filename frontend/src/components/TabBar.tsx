@@ -1,6 +1,6 @@
-import { FileText, Wrench, MessageSquare, Terminal } from 'lucide-react';
+import { FileText, Wrench, MessageSquare, Terminal, Cog } from 'lucide-react';
 
-type Tab = 'files' | 'skills' | 'request' | 'response';
+type Tab = 'files' | 'skills' | 'tools' | 'request' | 'response';
 
 interface TabBarProps {
   active: Tab;
@@ -8,12 +8,14 @@ interface TabBarProps {
   counts?: {
     files?: number;
     skills?: number;
+    tools?: number;
   };
 }
 
 const TABS: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'files', label: 'Files', Icon: FileText },
   { id: 'skills', label: 'Skills', Icon: Wrench },
+  { id: 'tools', label: 'Tools', Icon: Cog },
   { id: 'request', label: 'Request', Icon: MessageSquare },
   { id: 'response', label: 'Response', Icon: Terminal },
 ];
@@ -26,7 +28,10 @@ export function TabBar({ active, onChange, counts }: TabBarProps) {
     >
       {TABS.map(({ id, label, Icon }) => {
         const isActive = active === id;
-        const count = id === 'files' ? counts?.files : id === 'skills' ? counts?.skills : undefined;
+        const count =
+          id === 'files' ? counts?.files :
+          id === 'skills' ? counts?.skills :
+          id === 'tools' ? counts?.tools : undefined;
 
         return (
           <button

@@ -19,6 +19,7 @@ pub struct Execution {
     pub prompt: String,
     pub context_files: Vec<String>,
     pub skills_used: Vec<String>,
+    pub tools_used: Vec<String>,
     pub stdout: String,
     pub stderr: String,
     pub exit_code: i32,
@@ -64,6 +65,7 @@ fn init_db(app: &AppHandle) -> Result<Connection, Box<dyn std::error::Error>> {
             prompt TEXT NOT NULL,
             context_files TEXT NOT NULL DEFAULT '[]',
             skills_used TEXT NOT NULL DEFAULT '[]',
+            tools_used TEXT NOT NULL DEFAULT '[]',
             stdout TEXT NOT NULL DEFAULT '',
             stderr TEXT NOT NULL DEFAULT '',
             exit_code INTEGER NOT NULL DEFAULT 0
@@ -160,7 +162,7 @@ fn get_execution(id: String, state: State<AppState>) -> Result<Execution, String
 
     let mut stmt = conn
         .prepare(
-            "SELECT id, project, agent, timestamp, status, prompt, context_files, skills_used, stdout, stderr, exit_code
+            "SELECT id, project, agent, timestamp, status, prompt, context_files, skills_used, tools_used, stdout, stderr, exit_code
              FROM executions WHERE id = ?",
         )
         .map_err(|e| e.to_string())?;
@@ -169,6 +171,7 @@ fn get_execution(id: String, state: State<AppState>) -> Result<Execution, String
         .query_row([&id], |row| {
             let context_files_str: String = row.get(6)?;
             let skills_used_str: String = row.get(7)?;
+            let tools_used_str: String = row.get(8)?;
             Ok(Execution {
                 id: row.get(0)?,
                 project: row.get(1)?,
@@ -178,9 +181,10 @@ fn get_execution(id: String, state: State<AppState>) -> Result<Execution, String
                 prompt: row.get(5)?,
                 context_files: serde_json::from_str(&context_files_str).unwrap_or_default(),
                 skills_used: serde_json::from_str(&skills_used_str).unwrap_or_default(),
-                stdout: row.get(8)?,
-                stderr: row.get(9)?,
-                exit_code: row.get(10)?,
+                tools_used: serde_json::from_str(&tools_used_str).unwrap_or_default(),
+                stdout: row.get(9)?,
+                stderr: row.get(10)?,
+                exit_code: row.get(11)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -193,10 +197,11 @@ fn save_execution(execution: Execution, state: State<AppState>) -> Result<(), St
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     let context_files_json = serde_json::to_string(&execution.context_files).map_err(|e| e.to_string())?;
     let skills_used_json = serde_json::to_string(&execution.skills_used).map_err(|e| e.to_string())?;
+    let tools_used_json = serde_json::to_string(&execution.tools_used).map_err(|e| e.to_string())?;
 
     conn.execute(
-        "INSERT OR REPLACE INTO executions (id, project, agent, timestamp, status, prompt, context_files, skills_used, stdout, stderr, exit_code)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+        "INSERT OR REPLACE INTO executions (id, project, agent, timestamp, status, prompt, context_files, skills_used, tools_used, stdout, stderr, exit_code)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
         params![
             execution.id,
             execution.project,
@@ -206,6 +211,7 @@ fn save_execution(execution: Execution, state: State<AppState>) -> Result<(), St
             execution.prompt,
             context_files_json,
             skills_used_json,
+            tools_used_json,
             execution.stdout,
             execution.stderr,
             execution.exit_code,

@@ -16,6 +16,7 @@ export interface Execution {
   prompt: string;
   context_files: ContextFile[];
   skills_used: string[];
+  tools_used: string[];
   stdout: string;
   stderr: string;
   exit_code: number;

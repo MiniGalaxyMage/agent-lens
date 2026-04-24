@@ -2,6 +2,7 @@ import { useAppStore, useSelectedExecution } from '../store';
 import { TabBar } from './TabBar';
 import { FileCard } from './FileCard';
 import { SkillBadge } from './SkillBadge';
+import { ToolsTab } from './ToolsTab';
 import { PromptBlock } from './PromptBlock';
 import { StatusBadge } from './StatusBadge';
 import { Bot, Clock, Hash } from 'lucide-react';
@@ -78,6 +79,7 @@ export function ContextInspector() {
           counts={{
             files: execution.context_files.length,
             skills: execution.skills_used.length,
+            tools: execution.tools_used.length,
           }}
         />
       </div>
@@ -139,6 +141,8 @@ export function ContextInspector() {
             ))}
           </div>
         )}
+
+        {activeTab === 'tools' && <ToolsTab execution={execution} />}
 
         {activeTab === 'request' && (
           <div className="space-y-4">
